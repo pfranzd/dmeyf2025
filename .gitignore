@@ -2,6 +2,11 @@
 *.csv
 *.csv.gz
 
+# Archivos del VENV
+venv/
+__pycache__/
+*.pyc
+
 
 # Windows image file caches
 Thumbs.db
