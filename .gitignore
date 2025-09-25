@@ -3,10 +3,12 @@
 *.csv.gz
 
 # Archivos del VENV
-venv/
+envdm/
 __pycache__/
 *.pyc
 
+# DuckDB Temp
+src/monday/.tmp/
 
 # Windows image file caches
 Thumbs.db
