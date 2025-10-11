@@ -1,0 +1,71 @@
+# config.yaml
+STUDY_NAME : "lgb_optimization_competencia03_fe"
+
+competencia01:
+    DATA_PATH: "data/processed/competencia_01.csv"
+    SEMILLA: [154277, 204007, 223207, 301013, 639083]
+    MES_TRAIN: [202101, 202102]
+    MES_VALIDACION: 202103
+    MES_TEST: 202104
+    GANANCIA_ACIERTO: 780000
+    COSTO_ESTIMULO: 20000
+
+    # Configuración para entrenamiento final
+    FINAL_TRAIN: [202101, 202102, 202103, 202104]  # Todos los períodos para entrenar
+    FINAL_PREDIC: 202106
+    ATRIBUTOS_FE: 
+        ["active_quarter",
+        "mrentabilidad",
+        "mcomisiones",
+        "mactivos_margen",
+        "mpasivos_margen",
+        "cproductos",
+        "mcuenta_corriente",
+        "mcaja_ahorro",
+        "mcuentas_saldo",
+        "mautoservicio",
+        "mtarjeta_visa_consumo",
+        "mtarjeta_master_consumo",
+        "mprestamos_personales",
+        "mprestamos_prendarios",
+        "mprestamos_hipotecarios",
+        "mplazo_fijo_dolares",
+        "mplazo_fijo_pesos",
+        "minversion1_pesos",
+        "minversion1_dolares",
+        "minversion2",
+        "mpayroll",
+        "mpayroll2",
+        "mcuenta_debitos_automaticos",
+        "mttarjeta_visa_debitos_automaticos",
+        "mttarjeta_master_debitos_automaticos",
+        "mpagodeservicios",
+        "mpagomiscuentas",
+        "mcajeros_propios_descuentos",
+        "mtarjeta_visa_descuentos",
+        "mtarjeta_master_descuentos",
+        "mcomisiones_mantenimiento",
+        "mcomisiones_otras",
+        "mforex_buy",
+        "mforex_sell",
+        "mtransferencias_recibidas",
+        "mtransferencias_emitidas",
+        "cextraccion_autoservicio",
+        "mextraccion_autoservicio",
+        "mcheques_depositados",
+        "mcheques_emitidos",
+        "ctrx_quarter",
+        "Master_msaldototal",
+        "Visa_msaldototal"]
+
+parametros_lgb:
+    n_trail: 100
+    num_leaves: [100, 200]
+    learning_rate: [0.01, 0.3]
+    feature_fraction: [0.4, 1.0]
+    bagging_fraction: [0.25, 0.9]
+    min_child_samples: [5, 100]
+    max_depth: [8, 20]
+    reg_alpha: [0.0, 10.0]
+    reg_lambda: [0.0, 10.0]
+    bin: [30, 31]

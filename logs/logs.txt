@@ -1,0 +1,1 @@
+[2025-10-05 20:53:12.555879] Dataset cargado con 978439 filas y 154 columnas

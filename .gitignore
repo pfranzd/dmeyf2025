@@ -10,6 +10,13 @@ __pycache__/
 # DuckDB Temp
 src/monday/.tmp/
 
+# Predict
+predict/
+
+# Resultados
+resultados/
+optuna_results/
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
