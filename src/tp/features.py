@@ -56,6 +56,82 @@ def feature_engineering_business(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
+def feature_engineering_business_alternative(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Feature engineering de negocio: genera variables derivadas de relaciones
+    entre las columnas originales (sin usar lags ni medias móviles).
+    """
+
+    logger.info("Iniciando business feature engineering (versión corregida sin columnas inexistentes)")
+
+    sql = """
+    SELECT 
+        * EXCLUDE(clase_ternaria),
+
+        -- TARJETAS Y TRANSACCIONES
+        (ctarjeta_debito_transacciones + ctarjeta_visa_transacciones + ctarjeta_master_transacciones) AS ctarjeta_total_transacciones,
+        (ctarjeta_visa_transacciones + ctarjeta_master_transacciones) AS ctarjeta_credito_transacciones,
+        (mtarjeta_visa_consumo + mtarjeta_master_consumo) AS mtarjeta_credito_consumo,
+        (Visa_mlimitecompra + Master_mlimitecompra) AS credito_mlimitecompra,
+        (mtarjeta_credito_consumo / NULLIF(credito_mlimitecompra, 0)) AS ratio_consumo_credito,
+        IF(mtarjeta_credito_consumo > 0, 1, 0) AS usa_tarjeta_credito,
+
+        -- CUENTAS Y DEPÓSITOS (estos son pasivos desde el punto de vista del banco)
+        (mcaja_ahorro + mcaja_ahorro_adicional + mcaja_ahorro_dolares) AS mcaja_ahorro_total,
+        (mcuenta_corriente + mcuenta_corriente_adicional) AS mcuenta_corriente_total,
+        (mplazo_fijo_pesos + mplazo_fijo_dolares) AS mplazo_fijo_total,
+        (mcaja_ahorro_total + mcuenta_corriente_total + mplazo_fijo_total) AS mpasivos_total,
+        (mcaja_ahorro_total / NULLIF(mpasivos_total, 0)) AS ratio_ahorro_cuentas,
+        IF(mpasivos_total > 0, 1, 0) AS usa_cuentas,
+
+        -- INVERSIONES (activos del cliente)
+        (minversion1_pesos + minversion1_dolares + minversion2) AS minversiones_total,
+        IF(minversiones_total > 0, 1, 0) AS usa_inversiones,
+
+        -- PRÉSTAMOS
+        (mprestamos_personales + mprestamos_prendarios + mprestamos_hipotecarios) AS mprestamos_total,
+        IF(mprestamos_total > 0, 1, 0) AS usa_prestamos,
+
+        -- ACTIVOS Y TOTALES DEL CLIENTE
+        (minversiones_total + mprestamos_total) AS mactivos_total,
+        (mactivos_total + mpasivos_total) AS mbanco_total,
+
+        -- MÁRGENES
+        (mpasivos_margen + mactivos_margen) AS margen_total,
+        (margen_total / NULLIF(mactivos_total, 0)) AS ratio_margen_activos,
+        (margen_total / NULLIF(mpasivos_total, 0)) AS ratio_margen_pasivos,
+        (margen_total / NULLIF(mbanco_total, 0)) AS ratio_margen_banco,
+
+        -- RATIOS FINANCIEROS
+        (mactivos_total / NULLIF(mpasivos_total, 0)) AS ratio_activo_pasivo,
+
+        -- RENTABILIDAD
+        CASE 
+            WHEN mrentabilidad_annual = 0 THEN 0 
+            ELSE mrentabilidad / mrentabilidad_annual 
+        END AS porc_mrentabilidad_annual,
+
+        -- ENGAGEMENT
+        IF(cpayroll_trx > 0, 1, 0) AS tiene_payroll,
+        (ctrx_quarter / 3.0) AS ctrx_promedio_mensual,
+        (ctarjeta_total_transacciones / NULLIF(ctrx_quarter, 0)) AS ratio_tarjeta_transacciones,
+
+        -- DIVERSIFICACIÓN
+        ((usa_tarjeta_credito + usa_inversiones + usa_prestamos + tiene_payroll + usa_cuentas) / 5.0) AS ratio_uso_productos,
+
+        clase_ternaria
+    FROM df
+    """
+
+    con = duckdb.connect(database=":memory:")
+    con.register("df", df)
+    df = con.execute(sql).df()
+    con.close()
+
+    logger.info(f"Feature engineering completado. DataFrame resultante con {df.shape[1]} columnas")
+
+    return df
+
 
 def feature_engineering_lag(df: pd.DataFrame, columnas: list[str], cant_lag: int = 1) -> pd.DataFrame:
     """

@@ -5,11 +5,11 @@ import numpy as np
 import logging
 
 from src.tp.loader import cargar_datos, convertir_clase_ternaria_a_target
-from src.tp.features import feature_engineering_lag, feature_engineering_business, feature_engineering_moving_avg
+from src.tp.features import feature_engineering_lag, feature_engineering_business, feature_engineering_moving_avg, feature_engineering_business_alternative
 from src.tp.optimization import optimizar, evaluar_en_test, guardar_resultados_test
 from src.tp.optimizacion_cv import optimizar_con_cv
 from src.tp.best_params import cargar_mejores_hiperparametros
-from src.tp.final_training import preparar_datos_entrenamiento_final, generar_predicciones_finales, entrenar_modelo_final
+from src.tp.final_training import preparar_datos_entrenamiento_final, generar_predicciones_finales, entrenar_modelo_final, entrenar_modelos_multiples_semillas, generar_predicciones_ensamble
 from src.tp.output_manager import guardar_predicciones_finales
 from src.tp.config import *
 from src.tp.grafico_test import crear_grafico_ganancia_avanzado
@@ -41,7 +41,7 @@ def main():
     # 2. Feature Engineering
     # 2.1 Business Feature Engineering
 
-    df_fe = feature_engineering_business(df).copy()
+    df_fe = feature_engineering_business_alternative(df).copy()
 
     # 2.2 Time Feature Engineering
     
@@ -55,20 +55,20 @@ def main():
     df_fe_test = df_fe.copy()
 
     #02 Convertir clase_ternaria a target binario
-    df_fe = convertir_clase_ternaria_a_target(df_fe, True)
-    df_fe_test = convertir_clase_ternaria_a_target(df_fe_test, False)
+    df_fe = convertir_clase_ternaria_a_target(df_fe, True) # True = BAJA+1 y BAJA+2
+    df_fe_test = convertir_clase_ternaria_a_target(df_fe_test, False) # False = solo BAJA+2
   
-    #03 Ejecutar optimizacion de hiperparametros
-    study = optimizar_con_cv(df_fe, n_trials=5)
+    # #03 Ejecutar optimizacion de hiperparametros
+    # study = optimizar_con_cv(df_fe, n_trials=50)
   
-    #04 Análisis adicional
-    logger.info("=== ANÁLISIS DE RESULTADOS ===")
-    trials_df = study.trials_dataframe()
-    if len(trials_df) > 0:
-        top_5 = trials_df.nlargest(5, 'value')
-        logger.info("Top 5 mejores trials:")
-        for idx, trial in top_5.iterrows():
-            logger.info(f"  Trial {trial['number']}: {trial['value']:,.0f}")
+    # #04 Análisis adicional
+    # logger.info("=== ANÁLISIS DE RESULTADOS ===")
+    # trials_df = study.trials_dataframe()
+    # if len(trials_df) > 0:
+    #     top_5 = trials_df.nlargest(5, 'value')
+    #     logger.info("Top 5 mejores trials:")
+    #     for idx, trial in top_5.iterrows():
+    #         logger.info(f"  Trial {trial['number']}: {trial['value']:,.0f}")
   
     # logger.info("=== OPTIMIZACIÓN COMPLETADA ===")
   
@@ -100,11 +100,19 @@ def main():
   
     # Entrenar modelo final
     logger.info("Entrenar modelo final")
-    modelo_final = entrenar_modelo_final(X_train, y_train, mejores_params)
+    # Caso con una sola semilla
+    # modelo_final = entrenar_modelo_final(X_train, y_train, mejores_params)
+    
+    # Caso con múltiples semillas y ensamble
+    modelos_ensemble = entrenar_modelos_multiples_semillas(X_train, y_train, mejores_params)
   
     # Generar predicciones finales
     logger.info("Generar predicciones finales")
-    resultados = generar_predicciones_finales(modelo_final, X_predict, clientes_predict)
+    # Caso con una sola semilla
+    # resultados = generar_predicciones_finales(modelo_final, X_predict, clientes_predict, umbral=10000, tipo_umbral='cantidad')
+    
+    # Caso con múltiples semillas y ensamble
+    resultados = generar_predicciones_ensamble(modelos_ensemble, X_predict, clientes_predict, umbral=0.035)
   
     # Guardar predicciones
     logger.info("Guardar predicciones")

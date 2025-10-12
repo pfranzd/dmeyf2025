@@ -12,7 +12,7 @@ from .config import (
     # , FEATURES
 )
 from .gain_function import ganancia_evaluator
-from src.tp.grafico_test import generar_grafico_importancia
+from src.tp.grafico_test import generar_grafico_importancia, generar_graficos_optuna
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +69,7 @@ def objetivo_ganancia_temporal(trial, df) -> float:
     # ================================
     # 3️⃣ Loop temporal (sin leakage)
     # ================================
+    
     for i, (train_meses, valid_mes) in enumerate(folds_temporales, 1):
         df_train = df[df["foto_mes"].isin(train_meses)]
         df_valid = df[df["foto_mes"] == valid_mes]
@@ -124,7 +125,7 @@ def objetivo_ganancia_cv(trial, df) -> float:
     """
     Función objetivo para Optuna con Cross Validation.
     Utiliza SEMILLA[0] desde configuración para reproducibilidad.
-  
+
     Args:
         trial: Trial de Optuna
         df: DataFrame con datos
@@ -232,10 +233,8 @@ def optimizar_con_cv(df, n_trials=50) -> optuna.Study:
     )
   
     # Ejecutar optimización
-
     # study.optimize(lambda trial: objetivo_ganancia_cv(trial, df), n_trials=n_trials)
     study.optimize(lambda trial: objetivo_ganancia_temporal(trial, df), n_trials=n_trials)
-
 
     # Obtener los mejores parámetros
     best_params = study.best_params
@@ -278,7 +277,6 @@ def optimizar_con_cv(df, n_trials=50) -> optuna.Study:
     # ===========================
     # GUARDAR RESULTADOS FINALES
     # ===========================
-
     resultados = []
     for t in study.trials:
         resultados.append({
@@ -296,6 +294,11 @@ def optimizar_con_cv(df, n_trials=50) -> optuna.Study:
     logger.info(f"Resultados completos guardados en {archivo_final}")
     logger.info(f"Mejor ganancia: {study.best_value:,.0f}")
     logger.info(f"Mejores parámetros: {study.best_params}")
+
+    try:
+        generar_graficos_optuna(study, study_name)
+    except Exception as e:
+        logger.warning(f"No se pudieron generar los gráficos de Optuna: {e}")
 
     # Resultados
     return study

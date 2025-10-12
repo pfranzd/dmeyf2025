@@ -252,3 +252,56 @@ def generar_grafico_importancia(modelo: lgb.Booster,
     plt.tight_layout()
     plt.savefig(ruta_salida, dpi=300, bbox_inches="tight")
     plt.close()
+
+import optuna
+import optuna.visualization as vis
+import plotly.io as pio
+
+def generar_graficos_optuna(study: optuna.Study, study_name: str = None) -> dict:
+    """
+    Genera y guarda los gráficos principales del estudio Optuna:
+    - Contour plot
+    - Parallel coordinate
+    - Importancia de hiperparámetros
+
+    Args:
+        study (optuna.Study): Estudio Optuna ya ejecutado.
+        study_name (str, opcional): Nombre del estudio para nombrar los archivos.
+
+    Returns:
+        dict: Rutas de los gráficos generados.
+    """
+    logger.info("=== GENERANDO GRÁFICOS DE OPTUNA ===")
+    
+    os.makedirs("resultados", exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    nombre = study_name or "estudio_optuna"
+    rutas = {}
+
+    try:
+        # Contour Plot
+        fig_contour = vis.plot_contour(study)
+        path_contour = f"resultados/{nombre}_contour_{timestamp}.png"
+        fig_contour.write_image(path_contour, format="png", scale=2)
+        rutas["contour"] = path_contour
+
+        # Parallel Coordinate Plot
+        fig_parallel = vis.plot_parallel_coordinate(study)
+        path_parallel = f"resultados/{nombre}_parallel_{timestamp}.png"
+        fig_parallel.write_image(path_parallel, format="png", scale=2)
+        rutas["parallel"] = path_parallel
+
+        # Parameter Importance Plot
+        fig_importance = vis.plot_param_importances(study)
+        path_importance = f"resultados/{nombre}_importance_{timestamp}.png"
+        fig_importance.write_image(path_importance, format="png", scale=2)
+        rutas["importance"] = path_importance
+
+        logger.info("Gráficos de Optuna generados exitosamente:")
+        for k, v in rutas.items():
+            logger.info(f"  - {k}: {v}")
+
+    except Exception as e:
+        logger.warning(f"No se pudieron generar los gráficos de Optuna: {e}")
+
+    return rutas
