@@ -171,9 +171,11 @@ def entrenar_modelos_multiples_semillas(
     """
     modelos = []
 
-    logger.info(f"Entrenando {len(SEMILLA)} modelos con distintas semillas para ensamblado...")
-    for i, seed in enumerate(SEMILLA, start=1):
-        logger.info(f"🔁 Entrenando modelo {i}/{len(SEMILLA)} con seed={seed}")
+    SEMILLA_NUEVA = SEMILLA + [111111, 222222, 333333, 444444, 555555]
+
+    logger.info(f"Entrenando {len(SEMILLA_NUEVA)} modelos con distintas semillas para ensamblado...")
+    for i, seed in enumerate(SEMILLA_NUEVA, start=1):
+        logger.info(f"🔁 Entrenando modelo {i}/{len(SEMILLA_NUEVA)} con seed={seed}")
 
         params = {
             'objective': 'binary',

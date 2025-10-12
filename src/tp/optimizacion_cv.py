@@ -69,7 +69,7 @@ def objetivo_ganancia_temporal(trial, df) -> float:
     # ================================
     # 3️⃣ Loop temporal (sin leakage)
     # ================================
-    
+
     for i, (train_meses, valid_mes) in enumerate(folds_temporales, 1):
         df_train = df[df["foto_mes"].isin(train_meses)]
         df_valid = df[df["foto_mes"] == valid_mes]

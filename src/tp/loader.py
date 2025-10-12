@@ -36,7 +36,7 @@ def convertir_clase_ternaria_a_target(df: pd.DataFrame, baja: bool = True) -> pd
     """
     # Crear copia del DataFrame para no modificar el original
     df_result = df.copy()
-  
+
     # Contar valores originales para logging
     n_continua_orig = (df_result['clase_ternaria'] == 'CONTINUA').sum()
     n_baja1_orig = (df_result['clase_ternaria'] == 'BAJA+1').sum()

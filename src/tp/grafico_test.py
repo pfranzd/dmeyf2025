@@ -28,9 +28,20 @@ def calcular_ganancia_acumulada_optimizada(y_true: np.ndarray, y_pred_proba: np.
   
     # Ordenar por probabilidad descendente
     indices_ordenados = np.argsort(y_pred_proba)[::-1]
+    print("indices_ordenados:")
+    print(len(indices_ordenados))
+    print(indices_ordenados)
     y_true_ordenado = y_true[indices_ordenados]
+    print("y_true_ordenado:")
+    print(len(y_true_ordenado))
+    print(y_true_ordenado)
+    print(y_true_ordenado.sum())
+    print(np.unique(y_true_ordenado, return_counts=True))
     y_pred_proba_ordenado = y_pred_proba[indices_ordenados]
-  
+    print("y_pred_proba_ordenado:")
+    print(len(y_pred_proba_ordenado))
+    print(y_pred_proba_ordenado)
+
     # Calcular ganancia acumulada vectorizada
     ganancias_individuales = np.where(y_true_ordenado == 1, GANANCIA_ACIERTO, -COSTO_ESTIMULO)
     # ganancias_individuales = np.where(y_true_ordenado == 1, GANANCIA_ACIERTO,0) - np.where(y_true_ordenado == 0, COSTO_ESTIMULO, 0)
@@ -72,14 +83,14 @@ def crear_grafico_ganancia_avanzado(y_true: np.ndarray, y_pred_proba: np.ndarray
     clientes_sobre_025 = np.sum(y_pred_proba >= umbral_025)
   
     # # Filtrar datos para visualización (solo mostrar región relevante)
-    # umbral_ganancia = ganancia_maxima * 0.6  # Mostrar desde 60% de la ganancia máxima
-    # indices_relevantes = ganancias_acumuladas >= umbral_ganancia
-    # x_relevante = np.where(indices_relevantes)[0]
-    # y_relevante = ganancias_acumuladas[indices_relevantes]
+    umbral_ganancia = ganancia_maxima * 0.6  # Mostrar desde 60% de la ganancia máxima
+    indices_relevantes = ganancias_acumuladas >= umbral_ganancia
+    x_relevante = np.where(indices_relevantes)[0]
+    y_relevante = ganancias_acumuladas[indices_relevantes]
 
     # Alternativa para graficar sin filtrar los datos
-    x_relevante = np.arange(len(ganancias_acumuladas))
-    y_relevante = ganancias_acumuladas
+    # x_relevante = np.arange(len(ganancias_acumuladas))
+    # y_relevante = ganancias_acumuladas
   
     # Configurar estilo del gráfico
     plt.style.use('seaborn-v0_8')
@@ -282,19 +293,19 @@ def generar_graficos_optuna(study: optuna.Study, study_name: str = None) -> dict
         # Contour Plot
         fig_contour = vis.plot_contour(study)
         path_contour = f"resultados/{nombre}_contour_{timestamp}.png"
-        fig_contour.write_image(path_contour, format="png", scale=2)
+        fig_contour.write_image(path_contour, format="png", scale=3)
         rutas["contour"] = path_contour
 
         # Parallel Coordinate Plot
         fig_parallel = vis.plot_parallel_coordinate(study)
         path_parallel = f"resultados/{nombre}_parallel_{timestamp}.png"
-        fig_parallel.write_image(path_parallel, format="png", scale=2)
+        fig_parallel.write_image(path_parallel, format="png", scale=3)
         rutas["parallel"] = path_parallel
 
         # Parameter Importance Plot
         fig_importance = vis.plot_param_importances(study)
         path_importance = f"resultados/{nombre}_importance_{timestamp}.png"
-        fig_importance.write_image(path_importance, format="png", scale=2)
+        fig_importance.write_image(path_importance, format="png", scale=3)
         rutas["importance"] = path_importance
 
         logger.info("Gráficos de Optuna generados exitosamente:")

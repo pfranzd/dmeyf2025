@@ -58,19 +58,19 @@ def main():
     df_fe = convertir_clase_ternaria_a_target(df_fe, True) # True = BAJA+1 y BAJA+2
     df_fe_test = convertir_clase_ternaria_a_target(df_fe_test, False) # False = solo BAJA+2
   
-    # #03 Ejecutar optimizacion de hiperparametros
-    # study = optimizar_con_cv(df_fe, n_trials=50)
+    #03 Ejecutar optimizacion de hiperparametros
+    study = optimizar_con_cv(df_fe, n_trials=20)
   
-    # #04 Análisis adicional
-    # logger.info("=== ANÁLISIS DE RESULTADOS ===")
-    # trials_df = study.trials_dataframe()
-    # if len(trials_df) > 0:
-    #     top_5 = trials_df.nlargest(5, 'value')
-    #     logger.info("Top 5 mejores trials:")
-    #     for idx, trial in top_5.iterrows():
-    #         logger.info(f"  Trial {trial['number']}: {trial['value']:,.0f}")
+    #04 Análisis adicional
+    logger.info("=== ANÁLISIS DE RESULTADOS ===")
+    trials_df = study.trials_dataframe()
+    if len(trials_df) > 0:
+        top_5 = trials_df.nlargest(5, 'value')
+        logger.info("Top 5 mejores trials:")
+        for idx, trial in top_5.iterrows():
+            logger.info(f"  Trial {trial['number']}: {trial['value']:,.0f}")
   
-    # logger.info("=== OPTIMIZACIÓN COMPLETADA ===")
+    logger.info("=== OPTIMIZACIÓN COMPLETADA ===")
   
     #05 Test en mes desconocido
     logger.info("=== EVALUACIÓN EN CONJUNTO DE TEST ===")
@@ -78,7 +78,8 @@ def main():
     mejores_params = cargar_mejores_hiperparametros()
   
     # Evaluar en test
-    resultados_test, y_pred_proba = evaluar_en_test(df_fe_test, mejores_params)
+    # resultados_test, y_pred_proba = evaluar_en_test(df_fe_test, mejores_params)
+    resultados_test, y_pred_proba, y_test = evaluar_en_test(df_fe_test, mejores_params)
   
     # Guardar resultados de test
     guardar_resultados_test(resultados_test)
@@ -90,8 +91,9 @@ def main():
 
     # Grafico de test
     # logger.info("=== GRAFICO DE TEST ===")
-    ruta_grafico = crear_grafico_ganancia_avanzado(np.array(df_fe['clase_ternaria']), np.array(y_pred_proba))
-    # logger.info(f"✅ Gráfico generado: {ruta_grafico}")
+    # ruta_grafico = crear_grafico_ganancia_avanzado(np.array(df_fe['clase_ternaria']), np.array(y_pred_proba))
+    ruta_grafico = crear_grafico_ganancia_avanzado(y_test, y_pred_proba)
+    logger.info(f"✅ Gráfico generado: {ruta_grafico}")
   
     #06 Entrenar modelo final
     logger.info("=== ENTRENAMIENTO FINAL ===")
@@ -112,7 +114,7 @@ def main():
     # resultados = generar_predicciones_finales(modelo_final, X_predict, clientes_predict, umbral=10000, tipo_umbral='cantidad')
     
     # Caso con múltiples semillas y ensamble
-    resultados = generar_predicciones_ensamble(modelos_ensemble, X_predict, clientes_predict, umbral=0.035)
+    resultados = generar_predicciones_ensamble(modelos_ensemble, X_predict, clientes_predict, umbral=10000, tipo_umbral='cantidad')
   
     # Guardar predicciones
     logger.info("Guardar predicciones")

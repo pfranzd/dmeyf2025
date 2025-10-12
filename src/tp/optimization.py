@@ -46,10 +46,9 @@ def objetivo_ganancia(trial, df) -> float:
         'first_metric_only': True,
         'boost_from_average': True,
         'feature_pre_filter': False,
-        'max_bin': 31,
+        'bin': 31,
         'num_leaves': num_leaves,
         'learning_rate': learning_rate,
-        'min_data_in_leaf': min_data_in_leaf,
         'feature_fraction': feature_fraction,
         'bagging_fraction': bagging_fraction,
         'random_state': SEMILLA[0],  # Desde configuración YAML
@@ -97,7 +96,7 @@ def guardar_iteracion(trial, ganancia, archivo_base=None):
             'mes_validacion': MES_VALIDACION
         }
     }
-  
+
     # Cargar datos existentes si el archivo ya existe
     if os.path.exists(archivo):
         with open(archivo, 'r') as f:
@@ -223,8 +222,8 @@ def evaluar_en_test(df, mejores_params) -> dict:
         'predicciones_positivas': int(predicciones_positivas),
         'porcentaje_positivas': float(porcentaje_positivas)
     }
-  
-    return resultados, y_pred_proba
+
+    return resultados, y_pred_proba, y_test
 
 def guardar_resultados_test(resultados_test, archivo_base=None):
     """
