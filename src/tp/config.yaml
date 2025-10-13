@@ -1,5 +1,5 @@
 # config.yaml
-STUDY_NAME : "lgb_optimization_competencia_14_fe"
+STUDY_NAME : "lgb_optimization_competencia_16_fe"
 
 competencia01:
     DATA_PATH: "data/processed/competencia_01.csv"

@@ -58,8 +58,8 @@ def objetivo_ganancia_temporal(trial, df) -> float:
     # ⚠️ Asegúrate de que estos meses existan en tu dataset
     folds_temporales = [
         ([202101], 202102),
-        ([202101, 202102], 202103),
-        ([202101, 202102, 202103], 202104)
+        ([202101, 202102], 202103)
+        ,([202101, 202102, 202103], 202104)
     ]
 
     features = [col for col in df.columns if col not in ["clase_ternaria"]]
@@ -229,7 +229,8 @@ def optimizar_con_cv(df, n_trials=50) -> optuna.Study:
     study = optuna.create_study(
         direction='maximize',
         study_name=study_name,
-        sampler=optuna.samplers.TPESampler(seed=SEMILLA[0] if isinstance(SEMILLA, list) else SEMILLA)
+        sampler=optuna.samplers.TPESampler(seed=SEMILLA[0] if isinstance(SEMILLA, list) else SEMILLA),
+        load_if_exists=True
     )
   
     # Ejecutar optimización

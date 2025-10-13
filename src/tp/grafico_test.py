@@ -28,20 +28,9 @@ def calcular_ganancia_acumulada_optimizada(y_true: np.ndarray, y_pred_proba: np.
   
     # Ordenar por probabilidad descendente
     indices_ordenados = np.argsort(y_pred_proba)[::-1]
-    print("indices_ordenados:")
-    print(len(indices_ordenados))
-    print(indices_ordenados)
     y_true_ordenado = y_true[indices_ordenados]
-    print("y_true_ordenado:")
-    print(len(y_true_ordenado))
-    print(y_true_ordenado)
-    print(y_true_ordenado.sum())
-    print(np.unique(y_true_ordenado, return_counts=True))
     y_pred_proba_ordenado = y_pred_proba[indices_ordenados]
-    print("y_pred_proba_ordenado:")
-    print(len(y_pred_proba_ordenado))
-    print(y_pred_proba_ordenado)
-
+    
     # Calcular ganancia acumulada vectorizada
     ganancias_individuales = np.where(y_true_ordenado == 1, GANANCIA_ACIERTO, -COSTO_ESTIMULO)
     # ganancias_individuales = np.where(y_true_ordenado == 1, GANANCIA_ACIERTO,0) - np.where(y_true_ordenado == 0, COSTO_ESTIMULO, 0)

@@ -58,19 +58,19 @@ def main():
     df_fe = convertir_clase_ternaria_a_target(df_fe, True) # True = BAJA+1 y BAJA+2
     df_fe_test = convertir_clase_ternaria_a_target(df_fe_test, False) # False = solo BAJA+2
   
-    #03 Ejecutar optimizacion de hiperparametros
-    study = optimizar_con_cv(df_fe, n_trials=20)
+    # #03 Ejecutar optimizacion de hiperparametros
+    # study = optimizar_con_cv(df_fe, n_trials=50)
   
-    #04 Análisis adicional
-    logger.info("=== ANÁLISIS DE RESULTADOS ===")
-    trials_df = study.trials_dataframe()
-    if len(trials_df) > 0:
-        top_5 = trials_df.nlargest(5, 'value')
-        logger.info("Top 5 mejores trials:")
-        for idx, trial in top_5.iterrows():
-            logger.info(f"  Trial {trial['number']}: {trial['value']:,.0f}")
+    # #04 Análisis adicional
+    # logger.info("=== ANÁLISIS DE RESULTADOS ===")
+    # trials_df = study.trials_dataframe()
+    # if len(trials_df) > 0:
+    #     top_5 = trials_df.nlargest(5, 'value')
+    #     logger.info("Top 5 mejores trials:")
+    #     for idx, trial in top_5.iterrows():
+    #         logger.info(f"  Trial {trial['number']}: {trial['value']:,.0f}")
   
-    logger.info("=== OPTIMIZACIÓN COMPLETADA ===")
+    # logger.info("=== OPTIMIZACIÓN COMPLETADA ===")
   
     #05 Test en mes desconocido
     logger.info("=== EVALUACIÓN EN CONJUNTO DE TEST ===")
@@ -114,7 +114,7 @@ def main():
     # resultados = generar_predicciones_finales(modelo_final, X_predict, clientes_predict, umbral=10000, tipo_umbral='cantidad')
     
     # Caso con múltiples semillas y ensamble
-    resultados = generar_predicciones_ensamble(modelos_ensemble, X_predict, clientes_predict, umbral=10000, tipo_umbral='cantidad')
+    resultados = generar_predicciones_ensamble(modelos_ensemble, X_predict, clientes_predict, umbral=11000, tipo_umbral='cantidad')
   
     # Guardar predicciones
     logger.info("Guardar predicciones")
