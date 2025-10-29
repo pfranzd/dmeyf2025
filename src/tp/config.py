@@ -39,7 +39,7 @@ try:
             "max_depth": _cfg_lgb.get("max_depth", [3, 10]),
             "reg_alpha": _cfg_lgb.get("reg_alpha", [0.0, 5.0]),
             "reg_lambda": _cfg_lgb.get("reg_lambda", [0.0, 5.0]),
-            "bin": _cfg_lgb.get("bin", [30, 31]),
+            "max_bin": _cfg_lgb.get("max_bin", [30, 31]),
         }
 
 except Exception as e:

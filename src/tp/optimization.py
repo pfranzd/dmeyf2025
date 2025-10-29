@@ -33,8 +33,8 @@ def objetivo_ganancia(trial, df) -> float:
 
     # Definir rangos de hiperparámetros a optimizar
     num_leaves = trial.suggest_int('num_leaves', 8, 100)
-    learning_rate = trial.suggest_float('learning_rate', 0.005, 0.3) # mas bajo, más iteraciones necesita
-    min_data_in_leaf = trial.suggest_int('min_data_in_leaf', 1, 1000)
+    learning_rate = trial.suggest_float('learning_rate', 0.003, 0.1) # mas bajo, más iteraciones necesita
+    min_data_in_leaf = trial.suggest_int('min_data_in_leaf', 10, 1500)
     feature_fraction = trial.suggest_float('feature_fraction', 0.1, 1.0)
     bagging_fraction = trial.suggest_float('bagging_fraction', 0.1, 1.0)
 
@@ -46,9 +46,10 @@ def objetivo_ganancia(trial, df) -> float:
         'first_metric_only': True,
         'boost_from_average': True,
         'feature_pre_filter': False,
-        'bin': 31,
+        'max_bin': 31,
         'num_leaves': num_leaves,
         'learning_rate': learning_rate,
+        'min_data_in_leaf': min_data_in_leaf,
         'feature_fraction': feature_fraction,
         'bagging_fraction': bagging_fraction,
         'random_state': SEMILLA[0],  # Desde configuración YAML
@@ -164,7 +165,7 @@ def evaluar_en_test(df, mejores_params) -> dict:
     Args:
         df: DataFrame con todos los datos
         mejores_params: Mejores hiperparámetros encontrados por Optuna
-  
+    
     Returns:
         dict: Resultados de la evaluación en test (ganancia + estadísticas básicas)
     """
@@ -190,16 +191,27 @@ def evaluar_en_test(df, mejores_params) -> dict:
     dtrain = lgb.Dataset(X_train, label=y_train)
     dtest = lgb.Dataset(X_test, label=y_test, reference=dtrain)
 
+    # Ajustar mejores parámetros para evaluación en test
+    mejores_params.update({
+        'deterministic': True,
+        'force_row_wise': True,
+        'bagging_seed': SEMILLA[0],
+        'feature_fraction_seed': SEMILLA[0],
+        'random_state': SEMILLA[0],
+        'num_threads': 1
+    })
+
     # Predecir en test
     modelo = lgb.train(
         mejores_params, 
         dtrain,
-        # valid_sets=[dtrain, dtest],
-        # valid_names=['train', 'test'],
-        # callbacks=[lgb.early_stopping(50), lgb.log_evaluation(0)],
+        valid_sets=[dtrain, dtest],
+        valid_names=['train', 'test'],
+        callbacks=[lgb.early_stopping(50), lgb.log_evaluation(0)],
         feval = ganancia_lgb_binary,
         num_boost_round=200,
         )
+    
     y_pred_proba = modelo.predict(X_test)
     y_pred_binary = (y_pred_proba > 0.025).astype(int)
 

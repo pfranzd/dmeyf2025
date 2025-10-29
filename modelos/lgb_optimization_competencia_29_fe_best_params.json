@@ -1,0 +1,21 @@
+{
+    "num_leaves": 198,
+    "learning_rate": 0.18392930111331032,
+    "feature_fraction": 0.43883459569555366,
+    "bagging_fraction": 0.7396038695459424,
+    "min_child_samples": 95,
+    "max_depth": 22,
+    "reg_alpha": 0.21231025558559263,
+    "reg_lambda": 10.616479980675676,
+    "max_bin": 31,
+    "seed": 154277,
+    "bagging_seed": 154277,
+    "feature_fraction_seed": 154277,
+    "data_random_seed": 154277,
+    "drop_seed": 154277,
+    "extra_seed": 154277,
+    "deterministic": true,
+    "force_row_wise": true,
+    "num_threads": 1,
+    "random_state": 154277
+}

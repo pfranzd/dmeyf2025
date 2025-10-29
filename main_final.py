@@ -70,7 +70,8 @@ def main():
                       'max_depth': 18, 
                       'reg_alpha': 1.660210153306255, 
                       'reg_lambda': 2.028983357996869, 
-                      'bin': 30}
+                      'max_bin': 31}
+    
     mejores_params.update({"objective": "binary", "metric": "custom"})
     logger.info(f"Hiperparámetros óptimos cargados: {mejores_params}")
 
